@@ -1,0 +1,37 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+.env
+credenciales.txt
+mis_claves.txt
+claves.txt
+personal.txt
+keys.txt
+NDUS.txt
+
+config.json
+.coverage
+htmlcov/
+
+.cache/
+
+# Datos de una sesión local: historial de conversación y logs de trabajos en segundo plano.
+sessions/
+jobs/
+logs/
+
+# Datos generados por la automatización web y perfiles locales.
+arena/.brave-perfil/
+arena/*.log
+arena/*.lock
+arena/*.sesion-*.json
+arena/*.estado.json
+arena/*.reclamos/
+arena/STOP
+arena/credenciales.txt
+arena/config.json
+arena-web/logs/
+arena/.nube-*
+arena/chats_archivados.jsonl
+repomix-output.xml

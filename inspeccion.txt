@@ -1,0 +1,68 @@
+=== BOTONES ===
+[0] aria="Toggle Sidebar" title="Toggle Sidebar" testid=null dis=false vis=true y=0 txt="" cls=button.hover:after:bg-sidebar-border.absolute.inset-y-0
+[1] aria="Arena menu" title=null testid=null dis=false vis=true y=8 txt="" cls=button.peer/menu-button.flex.items-center
+[2] aria=null title=null testid=null dis=false vis=true y=11 txt="" cls=button.hover:bg-surface-tertiary.flex-shrink-0.rounded-md
+[3] aria="More options" title="More options" testid=null dis=false vis=true y=214 txt="" cls=button.text-sidebar-foreground.ring-sidebar-ring.hover:bg-sidebar-accent
+[4] aria="More options" title="More options" testid=null dis=false vis=true y=250 txt="" cls=button.text-sidebar-foreground.ring-sidebar-ring.hover:bg-sidebar-accent
+[5] aria="More options" title="More options" testid=null dis=false vis=true y=286 txt="" cls=button.text-sidebar-foreground.ring-sidebar-ring.hover:bg-sidebar-accent
+[6] aria="More options" title="More options" testid=null dis=false vis=true y=322 txt="" cls=button.text-sidebar-foreground.ring-sidebar-ring.hover:bg-sidebar-accent
+[7] aria="More options" title="More options" testid=null dis=false vis=true y=410 txt="" cls=button.text-sidebar-foreground.ring-sidebar-ring.hover:bg-sidebar-accent
+[8] aria="More options" title="More options" testid=null dis=false vis=true y=446 txt="" cls=button.text-sidebar-foreground.ring-sidebar-ring.hover:bg-sidebar-accent
+[9] aria="More options" title="More options" testid=null dis=false vis=true y=482 txt="" cls=button.text-sidebar-foreground.ring-sidebar-ring.hover:bg-sidebar-accent
+[10] aria="More options" title="More options" testid=null dis=false vis=true y=570 txt="" cls=button.text-sidebar-foreground.ring-sidebar-ring.hover:bg-sidebar-accent
+[11] aria="More options" title="More options" testid=null dis=false vis=true y=606 txt="" cls=button.text-sidebar-foreground.ring-sidebar-ring.hover:bg-sidebar-accent
+[12] aria="More options" title="More options" testid=null dis=false vis=true y=642 txt="" cls=button.text-sidebar-foreground.ring-sidebar-ring.hover:bg-sidebar-accent
+[13] aria="More options" title="More options" testid=null dis=false vis=true y=678 txt="" cls=button.text-sidebar-foreground.ring-sidebar-ring.hover:bg-sidebar-accent
+[14] aria="More options" title="More options" testid=null dis=false vis=true y=714 txt="" cls=button.text-sidebar-foreground.ring-sidebar-ring.hover:bg-sidebar-accent
+[15] aria="More options" title="More options" testid=null dis=false vis=true y=750 txt="" cls=button.text-sidebar-foreground.ring-sidebar-ring.hover:bg-sidebar-accent
+[16] aria="More options" title="More options" testid=null dis=false vis=true y=786 txt="" cls=button.text-sidebar-foreground.ring-sidebar-ring.hover:bg-sidebar-accent
+[17] aria="More options" title="More options" testid=null dis=false vis=true y=822 txt="" cls=button.text-sidebar-foreground.ring-sidebar-ring.hover:bg-sidebar-accent
+[18] aria="More options" title="More options" testid=null dis=false vis=true y=858 txt="" cls=button.text-sidebar-foreground.ring-sidebar-ring.hover:bg-sidebar-accent
+[19] aria="More options" title="More options" testid=null dis=false vis=true y=894 txt="" cls=button.text-sidebar-foreground.ring-sidebar-ring.hover:bg-sidebar-accent
+[20] aria="More options" title="More options" testid=null dis=false vis=true y=930 txt="" cls=button.text-sidebar-foreground.ring-sidebar-ring.hover:bg-sidebar-accent
+[21] aria="More options" title="More options" testid=null dis=false vis=true y=966 txt="" cls=button.text-sidebar-foreground.ring-sidebar-ring.hover:bg-sidebar-accent
+[22] aria="More options" title="More options" testid=null dis=false vis=true y=1002 txt="" cls=button.text-sidebar-foreground.ring-sidebar-ring.hover:bg-sidebar-accent
+[23] aria=null title=null testid=null dis=false vis=true y=332 txt="leonardoaraya2301@alumnos.ubio" cls=button.hover:bg-accent.relative.flex
+[24] aria=null title=null testid=null dis=false vis=true y=389 txt="Cookies" cls=button.text-text-tertiary.hover:text-text-secondary.text-start
+[25] aria="Open sidebar" title=null testid=null dis=false vis=false y=0 txt="" cls=button.inline-flex.items-center.justify-center
+[26] aria="Open workspace" title=null testid=null dis=true vis=false y=0 txt="" cls=button.inline-flex.items-center.justify-center
+[27] aria="Expand workspace sidebar" title=null testid=null dis=true vis=true y=10 txt="" cls=button.inline-flex.items-center.justify-center
+[28] aria="GitHub" title=null testid=null dis=false vis=false y=0 txt="GitHub" cls=button.border-border-medium.bg-surface-primary.text-text-primary
+[29] aria="Drive" title=null testid=null dis=false vis=false y=0 txt="Drive" cls=button.border-border-medium.bg-surface-primary.text-text-primary
+[30] aria="Docs" title=null testid=null dis=false vis=false y=0 txt="Google DocsDocs" cls=button.border-border-medium.bg-surface-primary.text-text-primary
+[31] aria="Notion" title=null testid=null dis=false vis=false y=0 txt="Notion" cls=button.border-border-medium.bg-surface-primary.text-text-primary
+[32] aria="Gmail" title=null testid=null dis=false vis=false y=0 txt="Gmail" cls=button.border-border-medium.bg-surface-primary.text-text-primary
+[33] aria="Linear" title=null testid=null dis=false vis=false y=0 txt="Linear" cls=button.border-border-medium.bg-surface-primary.text-text-primary
+[34] aria="Cal" title=null testid=null dis=false vis=false y=0 txt="Cal" cls=button.border-border-medium.bg-surface-primary.text-text-primary
+[35] aria="Add files and connections" title=null testid=null dis=false vis=true y=234 txt="" cls=button.touch-hitbox.text-text-secondary.hover:text-text-primary
+[36] aria=null title=null testid=null dis=false vis=true y=234 txt="Agent" cls=button.border-border.text-header-secondary.hover:text-header-primary
+[37] aria="Model" title=null testid=null dis=false vis=true y=234 txt="Auto" cls=button.border-border.text-header-secondary.hover:text-header-primary
+[38] aria=null title=null testid=null dis=false vis=true y=234 txt="" cls=button.text-interactive-normal.hover:text-interactive-active.focus-visible:text-interactive-active
+[39] aria="Send message" title=null testid=null dis=true vis=true y=234 txt="" cls=button.inline-flex.items-center.justify-center
+[40] aria="GitHub" title=null testid=null dis=false vis=true y=287 txt="GitHub" cls=button.border-border-medium.bg-surface-primary.text-text-primary
+[41] aria="Drive" title=null testid=null dis=false vis=true y=287 txt="Drive" cls=button.border-border-medium.bg-surface-primary.text-text-primary
+[42] aria="Docs" title=null testid=null dis=false vis=true y=287 txt="Google DocsDocs" cls=button.border-border-medium.bg-surface-primary.text-text-primary
+[43] aria="Notion" title=null testid=null dis=false vis=true y=287 txt="Notion" cls=button.border-border-medium.bg-surface-primary.text-text-primary
+[44] aria="Gmail" title=null testid=null dis=false vis=true y=287 txt="Gmail" cls=button.border-border-medium.bg-surface-primary.text-text-primary
+[45] aria="Linear" title=null testid=null dis=false vis=true y=287 txt="Linear" cls=button.border-border-medium.bg-surface-primary.text-text-primary
+[46] aria="Cal" title=null testid=null dis=false vis=true y=287 txt="Cal" cls=button.border-border-medium.bg-surface-primary.text-text-primary
+
+=== CONTENTEDITABLE ===
+[0] div.tiptap.ProseMirror.prose vis=true
+    padres: div.editor-content.max-h-[40vh].min-h-[32px] < div.flex.w-full.flex-col < div.flex.w-full.flex-col < div.bg-surface-secondary.relative.w-full < div.relative.w-full.max-w-2xl < div.relative.flex.flex-1
+    html: "<div contenteditable=\"true\" aria-disabled=\"false\" dir=\"auto\" lang=\"\" translate=\"no\" class=\"tiptap ProseMirror prose max-w-none focus:outline-none [&amp;_*]:[font-family:inherit!important] [font-family:inherit!important] prose-p:my-0.5 prose-p:leading-[1.25] prose-ul:my-[0.6em] [&amp;_code]:!font-mon"
+
+=== PRE / CODE ===
+
+=== CONTENEDORES CON SCROLL ===
+SCROLL div.flex.min-h-0.flex-col hijos=4 h=147
+   hijo[0] div.relative.flex.w-full len=261 txt="TodayHola Arena, necesito que crees un .txt para poner varios NDU distintos, con fines aca"
+   hijo[1] div.relative.flex.w-full len=312 txt="YesterdayCONTRATO DE PROMPT — léelo completo antes de responder.\n\nMARCO (y no lo vuelvas a"
+   hijo[2] div.relative.flex.w-full len=1037 txt="Older```\nDeja a autonoma en su mejor expresión \"\n\n```\nArena.ai System Prompt: Enterprise C"
+   hijo[3] div.flex.items-center.justify-center len=0 txt=""
+
+=== ATRIBUTOS data-* y aria-* EN USO ===
+aria-atomic, aria-autocomplete, aria-controls, aria-disabled, aria-expanded, aria-haspopup, aria-hidden, aria-label, aria-labelledby, aria-live, aria-relevant, data-active, data-cf-beacon, data-collapsible, data-nscript, data-orientation, data-placeholder, data-precedence, data-side, data-sidebar, data-size, data-slot, data-state, data-style, data-tiptap-style, data-variant
+
+=== TEXTO GLOBAL ===
+len body=1830 contieneStop=false

@@ -1,0 +1,3 @@
+# Dependencias del bot. Todo lo demás es librería estándar.
+# playwright habla con Brave por CDP (no necesita descargar un navegador propio).
+playwright>=1.40

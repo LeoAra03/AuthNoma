@@ -1,0 +1,223 @@
+# Autonoma 1.1 — segunda etapa de mejora
+
+> Actualización posterior: el usuario eligió Windows con acceso al host. Ver [WINDOWS_PRODUCCION.md](WINDOWS_PRODUCCION.md) para el nuevo alcance y las pruebas de la tercera etapa.
+
+17 de septiembre de 2026 · Rama `arena/01a0adf9-autonoma`
+
+## Resultado ejecutivo
+
+Se completó una segunda etapa centrada en contratos, seguridad por defecto, experiencia de confirmación y distribución verificable. La suite pasa de 38 a **114 pruebas offline**; la cobertura de líneas sube del 40% al **63,2%**. El proyecto todavía no merece 10/10: no cuenta con aislamiento del sistema operativo ni con validación real de proveedores, tecnologías asistivas y plataformas de escritorio.
+
+Este documento actualiza la [auditoría inicial](AUDITORIA.md), que se conserva como registro histórico.
+
+## Cambios aplicados
+
+### Arquitectura
+
+- `tool_contracts.py`: contrato compartido entre el esquema enviado al modelo y la validación local. Rechaza parámetros desconocidos, tipos incorrectos, JSON inválido, cadenas vacías para rutas/consultas, NUL, tamaños excesivos y números fuera de rango/no finitos. Un booleano ya no puede pasar como entero.
+- `tool_registry.py`: registro de adaptadores separado del bucle de conversación; una prueba comprueba correspondencia exacta entre herramientas registradas y anunciadas.
+- `knowledge.py`: almacenamiento independiente de notas, lecturas acotadas y creación exclusiva con nombres UUID para no sobrescribir notas homónimas. SearchEngine mantiene compatibilidad mediante herencia; la composición y la separación de backends web siguen pendientes.
+- `presentation.py`: presentación de controles de terminal y previsualización de operaciones separadas de Rich/CLI.
+- `pyproject.toml`: paquete instalable, comando `autonoma`, extras de teclado, navegador, build y pruebas. Se validó la construcción wheel/sdist y el entrypoint de la wheel instalada fuera del checkout.
+
+### Seguridad y calidad
+
+- **Shell deshabilitado por defecto**. `--allow-commands` lo habilita únicamente para esa sesión, conservando aprobación positiva por comando. Configuración y contenido generado por el modelo no pueden activarlo.
+- Herramientas inválidas se rechazan antes de solicitar aprobación o ejecutarse; no se convierten silenciosamente sus argumentos.
+- NoTrack exige HTTPS sin credenciales embebidas/query/fragmento, no sigue redirecciones y desactiva proxies implícitos del entorno. Los errores muestran recomendaciones para 401/403/429 sin devolver cuerpos remotos potencialmente sensibles.
+- Respuesta JSON de NoTrack limitada a 2 MB, validación de choices/message/tool_calls, IDs duplicados y número máximo de herramientas por respuesta.
+- Streaming SSE de texto con límites de tamaño, eventos completos, validación de deltas y detección de cierre faltante. Sigue siendo una API de texto: la CLI del agente aún no transmite respuestas con herramientas en streaming.
+- Copiar/mover exige destino nuevo y rechaza destino dentro del origen. Copias recursivas con symlinks se bloquean; escritura/borrado mediante rutas simbólicas y borrado/movimiento de ancestros de rutas protegidas también se bloquean.
+- Procesos admiten argv explícito para pruebas portables. La limpieza POSIX envía SIGKILL al grupo incluso si el padre ya salió; Windows intenta capturar descendientes antes de matar al padre. No se promete contención de procesos que escapen del grupo.
+- Ubicación de datos escribible para la instalación como paquete y override `AUTONOMA_HOME`; se conserva compatibilidad con checkout y ejecutable congelado.
+
+### UX y accesibilidad
+
+- Confirmaciones muestran advertencias según el impacto: privacidad de lecturas, shell sin aislamiento y operaciones destructivas.
+- Escritura muestra diff local acotado antes de confirmar; se avisa cuando es parcial o no puede calcularse. Los argumentos completos siguen visibles y el diff no escribe ni autoriza nada.
+- La tecla P no se procesa como cancelación mientras se introduce la confirmación; Ctrl+C cancela ese diálogo. Fuera del diálogo, el riesgo de activación accidental del listener global sigue pendiente.
+- Controles ESC, retorno de carro, bidi y otros caracteres de control se representan visiblemente en texto remoto, diffs, eventos y listados cubiertos, en vez de ejecutarse en la terminal. Se conserva Unicode legible.
+- Se informa duración total del turno; es medición local, no un benchmark ni un objetivo de latencia garantizado.
+- Se mantienen modos simple, movimiento reducido y compacto de la etapa anterior.
+
+### Dependencias y automatización
+
+- `requirements-lock.txt`: versiones fijadas y hashes para entorno base + pruebas en Linux/Python 3.11. Se instaló utilizando `--require-hashes`.
+- Una alerta del escáner sobre la versión de pytest inicialmente resuelta se corrigió actualizando la restricción y regenerando el lock.
+- La auditoría final del lock con `pip-audit --require-hashes` devolvió **«No known vulnerabilities found»**. Esto solo significa que el escáner no detectó vulnerabilidades conocidas en ese conjunto en el momento de la consulta; no cubre código propio ni extras opcionales.
+- CI configurada para Linux/Windows y Python 3.10/3.12, más Linux/3.11 con lock, auditoría de dependencias, build y umbral de cobertura combinada del 60%. **Estos jobs remotos aún no han sido observados**; no equivalen a pruebas realizadas en Windows.
+- Comprobación Ruff de errores F y compilación Python satisfactorias. No se afirma que haya type checking estricto o todos los estilos de lint habilitados.
+
+## Evidencia local
+
+Entorno: Linux, Python 3.11.2. Sin claves ni llamadas reales a NoTrack/Brave, sin interfaz gráfica.
+
+| Comprobación | Resultado |
+| --- | --- |
+| Pruebas | 114 satisfactorias |
+| Cobertura de líneas | 63,2% |
+| Cobertura de ramas | 56,7% |
+| Cobertura combinada líneas/ramas | 61,65%; supera umbral inicial de 60% |
+| Contratos de herramientas, combinada | 100% |
+| Cliente NoTrack, combinada | 88,0% |
+| Almacenamiento de notas, combinada | 92,2% |
+| Orquestador, combinada | 82,9% |
+| Ruff `--select F` y compileall | Sin errores |
+| Build wheel y sdist 1.1.0 | Correcto |
+| Entry point de wheel instalada | `Autonoma 1.1.0` |
+| Auditoría de dependencias del lock | Sin vulnerabilidades conocidas detectadas |
+
+Las métricas de módulos son del conjunto local de pruebas, no garantías sobre su seguridad. Las pruebas de HTTP usan MockTransport; las de procesos lanzan procesos Python pequeños sin efectos externos deliberados.
+
+## Cambios de comportamiento que requieren atención
+
+1. Para ejecutar comandos se necesita `--allow-commands`; aun habilitado, el shell tiene los permisos de la cuenta y no está aislado.
+2. Copias/movimientos ya no fusionan ni sobrescriben destinos existentes: el usuario debe elegir una ruta nueva explícita.
+3. `fetch_url` ya no duplica contenido guardándolo automáticamente como nota; para persistirlo existe `save_knowledge`.
+4. Argumentos que antes se convertían permisivamente ahora se rechazan. NoTrack con URL HTTP o proxy implícito deja de funcionar por diseño.
+5. El lock suministrado no es universal: otros Python/SO y extras opcionales resuelven sus propias dependencias desde pyproject; necesitan fijación y auditoría propias antes de distribuir.
+
+## Calificación provisional
+
+| Categoría | Tras primera etapa | Ahora | Condición pendiente para aspirar a 10 |
+| --- | ---: | ---: | --- |
+| Arquitectura | 6 | 7 | Separación de backends, interfaces tipadas y ciclo de vida de recursos más simple |
+| Calidad y seguridad | 6 | 7 | Sandbox/egreso real, cierre de carreras de archivos, más cobertura e integración real |
+| Usabilidad | 7 | 7 | Validar tareas y comprensión de permisos con usuarios, no solo por inspección |
+| Dinamismo | 6 | 6 | Streaming del agente, caché con TTL, concurrencia limitada y latencia medida con proveedor |
+| Personalización/accesibilidad | 7 | 7 | Preferencias guiadas/persistentes y pruebas con lector de pantalla/contraste |
+
+No se aumentan las notas UX solo por añadir funcionalidades sin observar su uso.
+
+## Próximas puertas de aceptación hacia 10/10
+
+- **Aislamiento:** decidir plataforma soportada para ejecutar comandos en contenedor/VM sin privilegios, con montajes y red mínimos; comprobar escapes, hardlinks, symlinks y procesos descendientes. La aprobación humana no sustituye esta capa.
+- **Red:** controlar egreso por conexión real, incluida resolución DNS y subrecursos Playwright. La validación previa actual sigue expuesta a DNS rebinding/TOCTOU.
+- **Calidad:** elevar progresivamente cobertura global y alcanzar al menos 90% de líneas/85% de ramas en componentes críticos, añadiendo casos de fallo y cancelación, no pruebas vacías para subir porcentajes.
+- **Integraciones/plataformas:** observar CI remota, probar Windows/macOS, listener global, ejecutables y cuentas reales de proveedores en un entorno de pruebas; auditar/lockear extras.
+- **Experiencia:** streaming compatible con herramientas sin ejecutarlas antes de terminar su validación; caché acotada con TTL y métricas por fase; pruebas observadas de tareas y cancelación.
+- **Accesibilidad y privacidad:** validación con lector de pantalla, redacción sistemática de logs, almacén de claves del SO y ajustes de presentación persistentes mediante UI.
+
+**Estado:** segunda etapa implementada y verificada localmente; plan completo hacia 10/10 todavía en curso. No se crearon commits, push ni PR.
+
+## Reproducción
+
+Desde la raíz, Python 3.11/Linux:
+
+```bash
+python -m venv .venv
+.venv/bin/python -m pip install --require-hashes -r autonoma-agent/requirements-lock.txt
+.venv/bin/python -m pytest autonoma-agent/tests --cov=autonoma --cov-branch --cov-fail-under=60
+.venv/bin/python -m compileall -q autonoma-agent/autonoma
+# Herramientas de mantenimiento, fuera del lock de aplicación/pruebas:
+.venv/bin/python -m pip install ruff pip-audit build
+.venv/bin/ruff check autonoma-agent/autonoma autonoma-agent/tests --select F
+.venv/bin/pip-audit --require-hashes -r autonoma-agent/requirements-lock.txt
+.venv/bin/python -m build autonoma-agent
+```
+
+
+---
+
+## Tercera etapa — refactor enterprise (versión 2.0.0, 17-09-2026)
+
+Informe completo: [ENTERPRISE_AUDIT_2026-09.md](ENTERPRISE_AUDIT_2026-09.md). Resumen:
+
+| Comprobación | Resultado |
+| --- | --- |
+| Pruebas | 425 satisfactorias (1 omitida por requerir NTFS real) |
+| Cobertura combinada líneas/ramas | 87,3% (umbral exigido 80%) |
+| `mypy --strict` | 0 errores en los 22 módulos del paquete |
+| `ruff check` (selección amplia) | 0 avisos |
+| `validate_arguments` | 11,23 µs → 2,55 µs (4,4×) |
+| `is_protected` con 60 raíces | 1597,86 µs → 24,49 µs (65×) |
+| `tool_schemas()` | 9,01 µs y mutable → 0,11 µs e inmutable (`MappingProxyType` recursivo) |
+| `research()` con 3 páginas | 159,3 ms secuencial → 59,9 ms en abanico (2,7×) |
+| Uso de memoria por turno | estable (p95 25 MiB, `growth_ratio` 0,94× sobre 12 turnos) |
+
+Cambios de comportamiento que conviene conocer:
+
+1. `Settings` es inmutable; `run_command` devuelve `CommandResult` tipado.
+2. Los errores del agente son `AutonomaError` con `ErrorCode` y `ExitCode`; la UI ya no
+   deduce el fallo buscando substrings.
+3. `/key` y `/brave` escriben en `.env` y aplican overrides locales: **el entorno del
+   proceso no se modifica** (dejar de exportar `AUTONOMA_HOME` globalmente).
+4. Cada recarga cierra los recursos del agente anterior (había acumulación de limpiezas
+   huérfanas); `close()` es idempotente y `unregister_cleanup` coincide por igualdad.
+5. Nuevos: `--selftest`, `/status` con métricas y percentiles, `logs/autonoma.jsonl` con
+   `trace_id`, `autonoma/py.typed`, `scripts/bench.py` como puerta de regresión.
+6. Empaquetado: `autonoma.spec` unificado (onefile en cualquier SO), `build_windows.ps1`,
+   `build_portable.sh` con fallback zipapp, artefactos y Release en CI.
+7. Distribución en un comando: `scripts/bootstrap.py` (npm start, `Run-Autonoma.bat`,
+   `./run-autonoma.sh`) y `scripts/make_bundle.py` (ZIP portable con LEEME y `.sha256`);
+   ver [INSTALL.md](INSTALL.md).
+
+## Tanda 2026-09-23 — «que sea capaz de lograrlo todo»
+
+Se cerraron las carencias que quedaron listadas tras la auditoría de capacidades. Cada una
+con su módulo, sus pruebas y su puerta de seguridad intacta.
+
+| Habilidad antes inexistente | Cómo quedó | Pieza clave |
+| --- | --- | --- |
+| Editar un archivo sin reescribirlo | `edit_file` con sustitución exacta y atómica; ambigüedad (>1 coincidencia sin `all`) es un error, no una adivinanza; `append_file` para anexar | `autonoma/text_ops.py` |
+| Ver un archivo grande entero | ventanas por líneas (`start_line`/`max_lines`) con cabecera `ruta:1-40 de N`; tope de lectura configurable (`READ_LIMIT_CHARS`) | `read_window` |
+| Buscar en disco | `search_files` (`grep -n`) sin seguir symlinks, saltando binarios y carpetas de artefactos; `glob` con semántica `Path.glob` (encontraba `**/*.py` pero no `README.md`: corregido) | `grep_tree` |
+| Leer una página larga | `fetch_url` devuelve ventanas y avista cuántos caracteres quedan (`start_char`); memo de 1 página para no re-descargar; `save=true` la archiva | `SearchEngine.fetch_url` |
+| Funcionar sin clave de NoTrack | endpoint local: `http` admitido **sólo** en loopback, clave opcional, `--doctor` lo explica | `notrack_client.validate_base_url` |
+| Recordar entre ejecuciones | sesiones `sessions/<id>.jsonl` (0600, un turno por línea); `--resume`, `/sessions`, `/resume`, `/forget`, `--attach`, `/attach`, `--no-persist` | `autonoma/sessions.py` |
+| Procesos que no terminan en segundos | `spawn_command` + `job_status`/`job_output`/`kill_job`; salida a `jobs/*.log` (0600), tope duro de vivos, archivo de trabajo archivado 64 entradas | `autonoma/jobs.py` |
+| Límites bajos | iteraciones 1–200, llamadas por vuelta 1–32, historia 2–512 mensajes, lecturas hasta 400 000 caracteres, timeout de comando hasta 1800 s | `NUMERIC_BOUNDS` |
+| Turnos de investigación lentos | las llamadas de sólo lectura de una vuelta corren en paralelo (1–8 hilos); en cuanto algo escribe, se vuelve a serie y el orden del payload se conserva | `Agent._run_tool_calls` |
+| Actualizarse | `npm run update` / `python scripts/bootstrap.py update`: fetch + `merge --ff-only` + re-instalación del entorno; se niega con árbol sucio; en bundle portable dice qué bajar | `scripts/bootstrap.py` |
+
+Decisiones de seguridad que **no** se movieron: nada de sandbox simulado, la aprobación humana
+sigue siendo `SI` explícito por operación, las rutas protegidas se respetan (y `force` no las
+elude), `ALLOW_PRIVATE_NETWORK` es opt-in explícito para tocar la red local, y un trabajo en
+segundo plano muere con la sesión (`panic.register_cleanup` + `AgentResources.close`).
+
+Puerta de calidad de la tanda: 532 pruebas que pasan en ~7 s, cobertura 87,1 % (puerta 80 %),
+`ruff check` y `ruff format --check` limpios, `mypy --strict` en Linux y `--platform win32`
+sin quejas. Nuevos archivos: `text_ops.py`, `sessions.py`, `jobs.py`, `tests/test_file_editing.py`,
+`tests/test_sessions.py`, `tests/test_jobs.py`, `tests/test_tool_concurrency.py`.
+
+Lo que sigue sin poder hacer (a propósito, por ahora): ver imágenes o PDF adjuntos, leer
+binarios (UTF-8 estricto para editar, `errors="replace"` para mirar), y actuar fuera de la
+raíz de datos sin aprobación. Nada de eso se resolvió fingiendo capacidad: se documenta.
+
+
+---
+
+## Tanda 2026-10-12 — funcionar solo sin aflojar la puerta
+
+Objetivo del usuario: «que no tenga que estar pegando un prompt tras otro; arena.ai se demora y quiero hacer otra
+cosa mientras». Se cerraron los tres huecos que impedían el desatendido real y se construyó el lazo que falta.
+
+| Carencia nombrada | Qué la resuelve | Pieza clave |
+| --- | --- | --- |
+| «En desatendido el supervisor aporta la aprobación» era falso: sin TTY todo se negaba | Política de aprobación delegada en JSON escrito por el humano: `roots` + allow-list por herramienta (prefijos de comando, globs de ruta), `deny` con prioridad, presupuesto por turno (`max_ops`/`max_writes`/`max_deletes`/`max_seconds`) y pausa tras 3 negaciones seguidas. `--approval-policy` / `APPROVAL_POLICY` / `/policy`. `--init-policy` (o `npm run policy`) escribe una plantilla conservadora | `autonoma/approval.py` |
+| El corte por tope de iteraciones borraba la línea de control y contaminaba el historial | El aviso del motor se **añade** al texto residual y, si no había `NEXT:`, se emite uno sintético; `--resume` recupera el turno con la señal intacta | `Agent._run_turn`, `_LIMIT_CONTINUATION` |
+| `spawn_command`/`kill_job` esquivaban `--allow-commands` | La familia de comandos se gatea junta (`COMMAND_TOOLS`); el flag rige `run_command`, `spawn_command` y `kill_job` por igual | `Agent._require_local_approval` |
+| No existía supervisor: había que reinyectar el prompt a mano | `--supervise` (o `npm run lazo -- "<objetivo>"`): protocolo `NEXT`/`DONE`/`BLOCKED`, topes `--turns`/`--minutes`, reinyección del objetivo tras un corte, reintento acotado ante turnos fallidos, corte limpio ante `Ctrl+C`/pánico, informe en `supervisor/turns.jsonl`, interrupción desde otra terminal con `supervisor/STOP`, corrección de rumbo con `supervisor/steer.txt`, `/next` en la REPL. Código de salida `8` cuando el lazo no llega a `DONE` | `autonoma/supervisor.py` |
+| La caja de herramientas externa dependía de un shell y de sus comillas | `argv` (lista de programa y argumentos, sin shell) como forma preferida en `run_command` y `spawn_command`; campo `array` en el contrato con validación estricta; la política sólo autoriza `command` (texto) si se escribe `allow_shell_commands` | `tool_contracts.py`, `tool_registry._run_command`, `JobRunner.spawn` |
+| «No amplíes tu propio alcance» era un ruego del prompt | `.env`, `config.json`, el prompt propio y la propia `approval.json` entran en las raíces protegidas del gestor de archivos: el agente no puede reescribir su configuración, y un `--allow-commands` no abre la puerta a reescribir la política que lo limita | `self_config_paths`, `build_agent` |
+| Comandos irreversibles sin ningún corte | Techo duro por tokens en `prepare_command` (único cuello de first y second plan): `rm -rf /`, `mkfs`/`diskpart`/`fdisk`, `dd of=/dev/…`, `chmod -R` sobre una raíz, apagar/reiniciar, escribir el registro, tubería hacia un shell y bomba de fork. Envoltorios (`bash -c "…"`) se evalúan por dentro. No lo levanta ninguna política ni `force` | `approval.command_ceiling` |
+
+Lo que **no** se movió: no hay sandbox ni aislamiento (se sigue diciendo en una línea), el `SI` humano
+sigue siendo la puerta por defecto, las rutas críticas del SO siguen bloqueadas, `ALLOW_PRIVATE_NETWORK`
+sigue apagado por defecto, y un trabajo en segundo plano muere con la sesión. La política delegada no
+añade permisos nuevos: traslada *quién* los concede del teclado a un archivo que el usuario escribió y
+que el agente no puede tocar.
+
+Puerta de calidad de la tanda: **692 pruebas** que pasan en ~10 s (antes 533), cobertura **87,98 %**
+(sobre puerta de 80 %), `ruff check` y `ruff format --check` limpios, `mypy --strict` en Linux y
+`--platform win32` sin quejas, `--selftest --json` y `--doctor --json` ok con dos comprobaciones nuevas
+(`approval_policy`, `supervisor`). Nuevos archivos: `approval.py`, `supervisor.py`,
+`tests/test_approval_policy.py` (76 pruebas), `tests/test_supervisor_loop.py` (27 pruebas). Se añadió
+`npm run lazo` y `npm run policy`, y el guard de coherencia de `INSTALL.md` ahora lee comandos `npm run x`
+aunque traigan argumentos.
+
+Comprobación punta a punta del desatendido (sin red, sin clave): `autonoma --init-policy --data-dir X` y luego
+`autonoma --data-dir X --approval-policy approval.json --supervise --turns 2 "objetivo"` → el lazo anuncia
+`política delegada activa (8 reglas, raíces: X)`, avisa que los comandos están deshabilitados, se detiene
+inmediatamente con `no hay modelo configurado: escribe la clave con /key…`, deja `X/supervisor/turns.jsonl`
+con `state="blocked"` y sale con código 8. Ninguna operación local se ejecutó sin autorización.
